@@ -1,0 +1,38 @@
+# Visual Studio / .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+.vscode/
+*.ncb
+*.vcxproj.user
+*.dotCover
+
+Directory.Build.props
+Directory.Build.targets
+
+# Rider
+.idea/
+*.sln.iml
+
+# Build output
+*.dll
+*.pdb
+*.cache
+*.db
+*.log
+
+# Mac
+.DS_Store
+
+# Linux
+.*.swp
+
+# Vintagestory mod build output
+/home/ric/.config/VintagestoryData/Mods/clickToggle/
+
+notes/
+old/
