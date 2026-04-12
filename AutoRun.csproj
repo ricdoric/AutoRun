@@ -99,48 +99,52 @@
   </ItemGroup>
 
   <!-- Create .zip files -->
-
   <Target Name="PackMod" AfterTargets="Build">
-  <PropertyGroup>
-    <_ModInfoPath>$(ProjectDir)modinfo.json</_ModInfoPath>
-    <_ModIconPath>$(ProjectDir)modicon.png</_ModIconPath>
-    <_ModInfoContent>$([System.IO.File]::ReadAllText($(_ModInfoPath)))</_ModInfoContent>
-    <_ModName>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"name"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModName>
-    <_ModVersion>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"version"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModVersion>
+    <PropertyGroup>
+      <_ModInfoPath>$(ProjectDir)modinfo.json</_ModInfoPath>
+      <_ModIconPath>$(ProjectDir)modicon.png</_ModIconPath>
+      <_ModInfoContent>$([System.IO.File]::ReadAllText($(_ModInfoPath)))</_ModInfoContent>
+      <_ModName>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"name"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModName>
+      <_ModId>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"modid"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModId>
+      <_ModVersion>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"version"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModVersion>
+      <!-- Zip name: net8 gets a suffix, net10 does not -->
+      <_ZipName Condition="'$(TargetFramework)' == 'net8.0'">$(_ModName)_8_$(_ModVersion).zip</_ZipName>
+      <_ZipName Condition="'$(TargetFramework)' != 'net8.0'">$(_ModName)_$(_ModVersion).zip</_ZipName>
+      <_OutDir>$(OutDir)</_OutDir>
+      <_ZipOut>$(ProjectDir)dist\$(_ZipName)</_ZipOut>
+    </PropertyGroup>
 
-    <!-- Zip name: net8 gets a suffix, net10 does not -->
-    <_ZipName Condition="'$(TargetFramework)' == 'net8.0'">$(_ModName)_8_$(_ModVersion).zip</_ZipName>
-    <_ZipName Condition="'$(TargetFramework)' != 'net8.0'">$(_ModName)_$(_ModVersion).zip</_ZipName>
+    <MakeDir Directories="$(ProjectDir)dist" />
 
-    <_OutDir>$(OutDir)</_OutDir>
-    <_ZipOut>$(ProjectDir)dist\$(_ZipName)</_ZipOut>
-  </PropertyGroup>
+    <!-- Build the file list: always include dll + modinfo, conditionally icon -->
+    <ItemGroup>
+      <_PackFiles Include="$(TargetPath)" />
+      <_PackFiles Include="$(_ModInfoPath)" />
+      <_PackFiles Include="$(_ModIconPath)" Condition="Exists('$(_ModIconPath)')" />
+    </ItemGroup>
 
-  <MakeDir Directories="$(ProjectDir)dist" />
+    <!-- ZipDirectory zips a whole folder, so use a temp staging dir instead -->
+    <PropertyGroup>
+      <_StageDir>$(BaseIntermediateOutputPath)pack-stage\$(TargetFramework)\</_StageDir>
+    </PropertyGroup>
 
-  <!-- Build the file list: always include dll + modinfo, conditionally icon -->
-  <ItemGroup>
-    <_PackFiles Include="$(TargetPath)" />
-    <_PackFiles Include="$(_ModInfoPath)" />
-    <_PackFiles Include="$(_ModIconPath)" Condition="Exists('$(_ModIconPath)')" />
-  </ItemGroup>
+    <RemoveDir Directories="$(_StageDir)" />
+    <MakeDir Directories="$(_StageDir)" />
+    <Copy SourceFiles="@(_PackFiles)" DestinationFolder="$(_StageDir)" />
 
-  <ZipDirectory SourceDirectory="$(_OutDir)"
-                DestinationFile="$(_ZipOut)"
-                Overwrite="true"
-                Condition="false" />
+    <!-- For net8, patch modid in the staged modinfo.json -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+      <_StagedModInfo>$(_StageDir)modinfo.json</_StagedModInfo>
+      <_PatchedContent>$([System.IO.File]::ReadAllText($(_StagedModInfo)).Replace('"modid": "$(_ModId)"', '"modid": "$(_ModId)net8"'))</_PatchedContent>
+    </PropertyGroup>
+    <WriteLinesToFile
+      Condition="'$(TargetFramework)' == 'net8.0'"
+      File="$(_StagedModInfo)"
+      Lines="$(_PatchedContent)"
+      Overwrite="true" />
 
-  <!-- ZipDirectory zips a whole folder, so use a temp staging dir instead -->
-  <PropertyGroup>
-    <_StageDir>$(BaseIntermediateOutputPath)pack-stage\$(TargetFramework)\</_StageDir>
-  </PropertyGroup>
-
-  <RemoveDir Directories="$(_StageDir)" />
-  <MakeDir Directories="$(_StageDir)" />
-  <Copy SourceFiles="@(_PackFiles)" DestinationFolder="$(_StageDir)" />
-  <ZipDirectory SourceDirectory="$(_StageDir)" DestinationFile="$(_ZipOut)" Overwrite="true" />
-
-  <Message Importance="high" Text="Packed: $(_ZipOut)" />
-</Target>
+    <ZipDirectory SourceDirectory="$(_StageDir)" DestinationFile="$(_ZipOut)" Overwrite="true" />
+    <Message Importance="high" Text="Packed: $(_ZipOut)" />
+  </Target>
 
 </Project>

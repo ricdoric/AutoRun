@@ -4,7 +4,7 @@
   "name": "AutoRun",
   "authors": ["Litric"],
   "description": "Automatically move forward by pressing a keybind",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
   }
 }
