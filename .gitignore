@@ -36,3 +36,4 @@ Directory.Build.targets
 
 notes/
 old/
+dist/

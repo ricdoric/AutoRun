@@ -1,11 +1,10 @@
 {
   "type": "code",
   "modid": "autorun",
-  "name": "Auto Run",
+  "name": "AutoRun",
   "authors": ["Litric"],
-  "description": "Automatically run by pressing a keybind",
-  "version": "1.0.0",
+  "description": "Automatically move forward by pressing a keybind",
+  "version": "1.0.2",
   "dependencies": {
-    "game": "1.22.0-rc.7"
   }
 }
