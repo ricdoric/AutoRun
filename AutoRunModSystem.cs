@@ -25,7 +25,12 @@ public class AutoRunModSystem : ModSystem
         Api.Input.HotKeys["walkforward"].TriggerOnUpAlso = false;
         Api.Input.SetHotKeyHandler("walkforward", OnWalkForwardHotkey);
 
-        Api.Input.RegisterHotKey("autorun", "Auto Run", GlKeys.V, HotkeyType.CharacterControls);
+        Api.Input.RegisterHotKey(
+            hotkeyCode: "autorun",
+            name: "(AutoRun) Toggle auto forward movement",
+            key: GlKeys.V,
+            type: HotkeyType.CharacterControls
+        );
         Api.Input.SetHotKeyHandler("autorun", OnAutoRunHotkey);
 
         Api.Event.RegisterGameTickListener(OnTick, 0);

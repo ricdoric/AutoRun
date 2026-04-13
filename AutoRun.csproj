@@ -99,7 +99,7 @@
   </ItemGroup>
 
   <!-- Create .zip files -->
-  <Target Name="PackMod" AfterTargets="Build">
+  <Target Name="PackMod" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">
     <PropertyGroup>
       <_ModInfoPath>$(ProjectDir)modinfo.json</_ModInfoPath>
       <_ModIconPath>$(ProjectDir)modicon.png</_ModIconPath>

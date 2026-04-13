@@ -3,8 +3,8 @@
   "modid": "autorun",
   "name": "AutoRun",
   "authors": ["Litric"],
-  "description": "Automatically move forward by pressing a keybind",
-  "version": "1.0.3",
+  "description": "Automatically move forward with hotkey (default V)",
+  "version": "1.0.4",
   "dependencies": {
   }
 }
