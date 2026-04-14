@@ -2,7 +2,6 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.Client.NoObf;
 using HarmonyLib;
-using System;
 
 namespace AutoRun;
 
@@ -15,7 +14,7 @@ public class AutoRunModSystem : ModSystem
     private static bool walkTriggerOnUpAlsoOriginal = false;
     private static bool _startingRun = false;
     internal static bool _suppressNextWalkUp = false;
-    private static bool _debug = true;
+    private static bool _debug = false;
 
     public override bool ShouldLoad(EnumAppSide side) => side == EnumAppSide.Client;
 
@@ -45,11 +44,8 @@ public class AutoRunModSystem : ModSystem
                 .HandleWith(OnDebugCommand)
             .EndSubCommand();
 
-
         _harmony = new Harmony("com.AutoRun");
         _harmony.PatchAll();
-
-        DebugMessage("AutoRun mod loaded v adding back in harmony :)");
     }
 
     public override void Dispose()
