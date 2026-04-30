@@ -4,7 +4,9 @@
   "name": "AutoRun",
   "authors": ["Litric"],
   "description": "Automatically move forward with hotkey (default V)",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "dependencies": {
+    "game": "1.22.0",
+    "survival": "1.22.0"
   }
 }

@@ -1,55 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <Reference Include="VintagestoryAPI">
-      <HintPath>$(VINTAGE_STORY_NET8)/VintagestoryAPI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Vintagestory">
-      <HintPath>$(VINTAGE_STORY_NET8)/Vintagestory.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="VSSurvivalMod">
-      <HintPath>$(VINTAGE_STORY_NET8)/Mods/VSSurvivalMod.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSEssentials">
-      <HintPath>$(VINTAGE_STORY_NET8)/Mods/VSEssentials.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSCreativeMod">
-      <HintPath>$(VINTAGE_STORY_NET8)/Mods/VSCreativeMod.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>$(VINTAGE_STORY_NET8)/Lib/Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>$(VINTAGE_STORY_NET8)/Lib/0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VintagestoryLib">
-      <HintPath>$(VINTAGE_STORY_NET8)/VintagestoryLib.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>$(VINTAGE_STORY_NET8)/Lib/protobuf-net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="cairo-sharp">
-      <HintPath>$(VINTAGE_STORY_NET8)/Lib/cairo-sharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Data.Sqlite">
-      <HintPath>$(VINTAGE_STORY_NET8)/Lib/Microsoft.Data.Sqlite.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <Reference Include="VintagestoryAPI">
@@ -107,9 +60,7 @@
       <_ModName>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"name"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModName>
       <_ModId>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"modid"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModId>
       <_ModVersion>$([System.Text.RegularExpressions.Regex]::Match($(_ModInfoContent), '"version"\s*:\s*"([^"]+)"').Groups[1].Value)</_ModVersion>
-      <!-- Zip name: net8 gets a suffix, net10 does not -->
-      <_ZipName Condition="'$(TargetFramework)' == 'net8.0'">$(_ModName)_8_$(_ModVersion).zip</_ZipName>
-      <_ZipName Condition="'$(TargetFramework)' != 'net8.0'">$(_ModName)_$(_ModVersion).zip</_ZipName>
+      <_ZipName>$(_ModName)_$(_ModVersion).zip</_ZipName>
       <_OutDir>$(OutDir)</_OutDir>
       <_ZipOut>$(ProjectDir)dist\$(_ZipName)</_ZipOut>
     </PropertyGroup>
@@ -131,17 +82,6 @@
     <RemoveDir Directories="$(_StageDir)" />
     <MakeDir Directories="$(_StageDir)" />
     <Copy SourceFiles="@(_PackFiles)" DestinationFolder="$(_StageDir)" />
-
-    <!-- For net8, patch modid in the staged modinfo.json -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-      <_StagedModInfo>$(_StageDir)modinfo.json</_StagedModInfo>
-      <_PatchedContent>$([System.IO.File]::ReadAllText($(_StagedModInfo)).Replace('"modid": "$(_ModId)"', '"modid": "$(_ModId)net8"'))</_PatchedContent>
-    </PropertyGroup>
-    <WriteLinesToFile
-      Condition="'$(TargetFramework)' == 'net8.0'"
-      File="$(_StagedModInfo)"
-      Lines="$(_PatchedContent)"
-      Overwrite="true" />
 
     <ZipDirectory SourceDirectory="$(_StageDir)" DestinationFile="$(_ZipOut)" Overwrite="true" />
     <Message Importance="high" Text="Packed: $(_ZipOut)" />
